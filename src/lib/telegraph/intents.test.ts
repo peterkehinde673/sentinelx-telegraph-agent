@@ -4,7 +4,7 @@ import {
   getExchangeIntent,
   isExchangeIntentId
 } from "./intents";
-import { parseCanonicalIntents } from "./catalog";
+import { getIntentCatalog, parseCanonicalIntents } from "./catalog";
 import { PROPOSED_FUTURE_INTENTS } from "./future-intents";
 
 describe("Exchange workflow intent catalogue", () => {
@@ -42,6 +42,50 @@ describe("live canonical intent normalization", () => {
     ] });
     expect(parsed).toHaveLength(1);
     expect(parsed[0]).toMatchObject({ id: "WEB_SEARCH", description: "Latest description", minerCount: 2 });
+  });
+
+
+  it("returns an empty list for empty, unknown, or non-array payloads", () => {
+    expect(parseCanonicalIntents([])).toEqual([]);
+    expect(parseCanonicalIntents({ intents: [] })).toEqual([]);
+    expect(parseCanonicalIntents({ unexpected: [{ id: "WEB_SEARCH" }] })).toEqual([]);
+    expect(parseCanonicalIntents("not-json-records")).toEqual([]);
+  });
+
+  it("does not accept malformed IDs or invalid miner counts", () => {
+    expect(parseCanonicalIntents([
+      { id: "lowercase_bad" },
+      { id: "WEB_SEARCH", miner_count: -2 },
+      { id: "CODE_REVIEW", miner_count: "many" }
+    ])).toEqual([
+      { id: "CODE_REVIEW", description: "Canonical intent reported by Telegraph.", minerCount: null, source: "telegraph" },
+      { id: "WEB_SEARCH", description: "Canonical intent reported by Telegraph.", minerCount: null, source: "telegraph" }
+    ]);
+  });
+
+  it("returns an explicit fallback state for HTTP failures", async () => {
+    const fakeFetch: typeof fetch = async () => new Response("unavailable", { status: 503 });
+    const result = await getIntentCatalog(fakeFetch);
+    expect(result.source).toBe("fallback");
+    expect(result.canonical).toEqual([]);
+    expect(result.error).toContain("HTTP 503");
+    expect(result.proposed.length).toBeGreaterThan(0);
+  });
+
+  it("treats an empty live catalogue as unavailable rather than success", async () => {
+    const fakeFetch: typeof fetch = async () => Response.json({ intents: [] });
+    const result = await getIntentCatalog(fakeFetch);
+    expect(result.source).toBe("fallback");
+    expect(result.canonical).toEqual([]);
+    expect(result.error).toContain("empty or unrecognized");
+  });
+
+  it("returns fallback state when the request throws", async () => {
+    const fakeFetch: typeof fetch = async () => { throw new Error("network offline"); };
+    const result = await getIntentCatalog(fakeFetch);
+    expect(result.source).toBe("fallback");
+    expect(result.error).toBe("network offline");
+    expect(result.fetchedAt).toBeNull();
   });
 
   it("keeps future proposals in a separate product registry", () => {
