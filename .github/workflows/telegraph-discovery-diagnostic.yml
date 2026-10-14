@@ -1,0 +1,59 @@
+name: Telegraph live discovery diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-discovery:
+    name: Read-only live endpoint inspection
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Capture documented public discovery endpoints
+        shell: bash
+        run: |
+          set -u
+          mkdir -p diagnostic
+          capture() {
+            local name="$1"
+            local url="$2"
+            local code
+            code="$(curl --silent --show-error --location --max-time 20 \
+              --output "diagnostic/${name}.json" \
+              --write-out '%{http_code}' "$url" 2>"diagnostic/${name}.stderr" || true)"
+            printf '%s\n' "${code:-000}" > "diagnostic/${name}.http-status"
+            if jq -e . "diagnostic/${name}.json" >/dev/null 2>&1; then
+              printf 'valid-json\n' > "diagnostic/${name}.json-status"
+            else
+              printf 'not-valid-json-or-empty\n' > "diagnostic/${name}.json-status"
+            fi
+          }
+          capture intents "https://devnode.telegraphprotocol.com/engine/v1/intents"
+          capture miners "https://devnode.telegraphprotocol.com/api/miners"
+          {
+            echo "## Telegraph discovery endpoint diagnostic"
+            echo
+            echo "Read-only requests only; no paid ask endpoint was called."
+            echo
+            for name in intents miners; do
+              echo "### ${name}"
+              echo "- HTTP status: $(cat "diagnostic/${name}.http-status")"
+              echo "- Body check: $(cat "diagnostic/${name}.json-status")"
+              if [ -s "diagnostic/${name}.stderr" ]; then
+                echo "- curl diagnostic: $(tr '\n' ' ' < "diagnostic/${name}.stderr" | cut -c1-400)"
+              fi
+              echo
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload response evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telegraph-discovery-diagnostic
+          path: diagnostic/
+          if-no-files-found: warn
+          retention-days: 7
