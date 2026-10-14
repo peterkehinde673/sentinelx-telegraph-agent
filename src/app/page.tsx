@@ -1,5 +1,6 @@
 import { EXCHANGE_INTENTS } from "@/lib/telegraph/intents";
 import IntentCatalog from "./intent-catalog";
+import MinerCatalog from "./miner-catalog";
 
 export default function Home() {
   return (
@@ -72,6 +73,8 @@ export default function Home() {
       </section>
 
       <IntentCatalog />
+
+      <MinerCatalog />
 
       <section className="section workflow-section">
         <p className="eyebrow">THE PROMISE</p>
