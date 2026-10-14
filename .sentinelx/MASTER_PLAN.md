@@ -25,8 +25,8 @@ The product must cover:
 
 ## Current control state
 
-- **Last verified:** 2026-10-14 — repository foundation and intent-catalogue UI/endpoint work committed; GitHub Actions status was pending at last check. No successful CI result has yet been confirmed in this checkpoint.
-- **Current next action:** Check the newest GitHub Actions run; fix all type-check, test, and build failures before starting live Telegraph request execution.
+- **Last verified:** 2026-10-14 — master plan committed and re-read from GitHub; latest observed GitHub Actions run #14 failed and run #15 was queued. CI success is not yet confirmed.
+- **Current next action:** Inspect the latest GitHub Actions run and job logs; fix all type-check, test, and build failures before starting live Telegraph request execution.
 - **Secrets configured:** Not verified.
 - **Public demo deployment:** Not verified.
 - **Real Telegraph paid transaction:** Not verified.
