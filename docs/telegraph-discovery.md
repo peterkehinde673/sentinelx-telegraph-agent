@@ -19,9 +19,9 @@ The miner catalogue is documented as a JSON array. Records include numeric `id`,
 ## Implementation in this repository
 
 - `src/lib/telegraph/catalog.ts` normalizes the live canonical intent catalogue.
-- `src/lib/telegraph/miners.ts` normalizes the miner catalogue while retaining endpoint metadata as untrusted raw records for later schema validation.
+- `src/lib/telegraph/miners.ts` normalizes the miner catalogue, validates endpoint path/method metadata, and derives conservative per-intent availability only from active miners that declare the intent and at least one valid endpoint. Request schemas remain untrusted metadata and must be validated before execution.
 - `src/app/api/intents/route.ts` and `src/app/api/miners/route.ts` expose no-store, read-only discovery routes.
-- Unit tests cover malformed payloads, deduplication, empty responses, HTTP failures, and network errors.
+- Unit tests cover malformed payloads, deduplication, endpoint path/method validation, conservative availability, empty responses, HTTP failures, and network errors.
 
 ## Safety constraints
 
