@@ -98,7 +98,7 @@ export default function MinerCatalog() {
               <p>{miner.supportedIntents.length ? miner.supportedIntents.join(", ") : "No supported intents declared"}</p>
             </div>
             <div className="catalog-item-meta">
-              <span className={`tag ${(miner.activationStatus ?? "").toLowerCase() === "active" ? "tag-canonical" : "tag-proposed"}`}>
+              <span className={`tag ${(miner.activationStatus ?? "").toLowerCase() === "active" ? "tag-canonical" : ""}`}>
                 {(miner.activationStatus ?? "STATUS UNKNOWN").toUpperCase()}
               </span>
               <span className="miner-count">{miner.minPriceUsdc === null ? "Price not declared" : `Min $ ${miner.minPriceUsdc} USDC`}</span>
