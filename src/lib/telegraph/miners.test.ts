@@ -40,6 +40,8 @@ describe("Telegraph miner discovery normalization", () => {
       activationStatus: "active",
       supportedIntents: ["CODE_REVIEW", "ONCHAIN_TX_LOOKUP"],
       minPriceUsdc: 10000,
+      inputSchema: { type: "object", properties: { tx_hash: { type: "string" } } },
+      outputSchema: { type: "object" },
       endpoints: [{ path: "/check-tx", method: "GET", schema: null }]
     }]);
   });
