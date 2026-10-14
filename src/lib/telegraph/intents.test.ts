@@ -33,6 +33,26 @@ describe("live canonical intent normalization", () => {
     ]);
   });
 
+  it("accepts the captured live Telegraph intent record shape", () => {
+    expect(parseCanonicalIntents({
+      count: 134,
+      canonical_on_chain: 134,
+      with_miners: 134,
+      intents: [{
+        intent_id: "SMART_CONTRACT_AUDIT",
+        intent_name: "SMART_CONTRACT_AUDIT",
+        description: "Inspects bytecode and smart contract source code.",
+        miner_count: 11,
+        canonical: true
+      }]
+    })).toEqual([{
+      id: "SMART_CONTRACT_AUDIT",
+      description: "Inspects bytecode and smart contract source code.",
+      minerCount: 11,
+      source: "telegraph"
+    }]);
+  });
+
   it("accepts wrapped payloads, deduplicates, and ignores malformed records", () => {
     const parsed = parseCanonicalIntents({ data: [
       { name: "WEB_SEARCH" },
