@@ -25,8 +25,8 @@ The product must cover:
 
 ## Current control state
 
-- **Last verified:** 2026-10-14 — GitHub Actions run #19 passed on main commit `97239217d4e9d1d56eefcc32436fd9ff485655dd`; dependency install, TypeScript check, unit tests, and production build all succeeded. Live Telegraph catalogue/miner responses have not yet been independently verified.
-- **Current next action:** Verify the live Telegraph intent catalogue and miner discovery response shapes from a reachable runtime, then document endpoint/schema evidence and add miner-discovery parsing/tests before any paid execution work.
+- **Last verified:** 2026-10-14 — GitHub Actions run #24 passed on commit `5b1a98818ccc26dc4ed44cd51ec73ae937a01111`; TypeScript check, unit tests, and production build succeeded. Miner discovery parsing/API are implemented and the dashboard miner registry has been added, but its CI run is queued. Telegraph's official docs confirm `/api/miners` fields and `/engine/v1/intents`; direct live endpoint access was unavailable in this session, so live payload verification remains outstanding.
+- **Current next action:** Verify CI for the miner dashboard changes, then obtain live endpoint payloads from a reachable runtime and validate real miner endpoint schemas before wiring availability into the execution planner.
 - **Secrets configured:** Not verified.
 - **Public demo deployment:** Not verified.
 - **Real Telegraph paid transaction:** Not verified.
