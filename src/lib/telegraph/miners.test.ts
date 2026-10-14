@@ -18,7 +18,7 @@ describe("Telegraph miner discovery normalization", () => {
       activationStatus: "active",
       supportedIntents: ["CODE_REVIEW", "WEB_SEARCH"],
       minPriceUsdc: 0.01,
-      endpoints: [{ path: "/review", method: "POST" }]
+      endpoints: [{ path: "/review", method: "POST", schema: null }]
     }]);
   });
 
