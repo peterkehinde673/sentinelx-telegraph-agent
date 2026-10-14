@@ -21,6 +21,8 @@ The captured live miner response is a JSON array with 1,908 records. `id` values
 - `src/lib/telegraph/catalog.ts` normalizes the live canonical intent catalogue.
 - `src/lib/telegraph/miners.ts` normalizes the miner catalogue, preserves provider-supplied miner-level `input_schema` and `output_schema` as untrusted metadata, validates endpoint path/method metadata, and derives conservative per-intent availability only from active miners that declare the intent and at least one valid endpoint. Availability is a discovery-metadata result only. The live snapshot shows schemas are generally at miner level rather than endpoint level; schema-to-endpoint compatibility remains unverified and must be validated before execution.
 - `src/app/api/intents/route.ts` and `src/app/api/miners/route.ts` expose no-store, read-only discovery routes.
+- `src/lib/telegraph/planner.ts` builds a deterministic, read-only plan for every canonical intent returned by live discovery, without an Exchange-only allowlist. It reports candidate miners and conservative schema readiness; miner-level schemas are not assumed to be endpoint schemas.
+- `src/app/api/planner/route.ts` exposes that plan at `GET /api/planner`. The route performs discovery only: it does not call paid ask endpoints, sign transactions, or authorize payments. A planner result is not a guarantee of endpoint health, schema compatibility, or execution success.
 - Unit tests cover malformed payloads, deduplication, endpoint path/method validation, conservative availability, empty responses, HTTP failures, and network errors.
 
 ## Safety constraints
