@@ -25,8 +25,8 @@ The product must cover:
 
 ## Current control state
 
-- **Last verified:** 2026-10-14 — master plan committed and re-read from GitHub; latest observed GitHub Actions run #14 failed and run #15 was queued. CI success is not yet confirmed.
-- **Current next action:** Inspect the latest GitHub Actions run and job logs; fix all type-check, test, and build failures before starting live Telegraph request execution.
+- **Last verified:** 2026-10-14 — GitHub Actions run #19 passed on main commit `97239217d4e9d1d56eefcc32436fd9ff485655dd`; dependency install, TypeScript check, unit tests, and production build all succeeded. Live Telegraph catalogue/miner responses have not yet been independently verified.
+- **Current next action:** Verify the live Telegraph intent catalogue and miner discovery response shapes from a reachable runtime, then document endpoint/schema evidence and add miner-discovery parsing/tests before any paid execution work.
 - **Secrets configured:** Not verified.
 - **Public demo deployment:** Not verified.
 - **Real Telegraph paid transaction:** Not verified.
