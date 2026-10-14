@@ -58,10 +58,10 @@ export function parseCanonicalIntents(payload: unknown): CanonicalIntent[] {
   return [...byId.values()].sort((a, b) => a.id.localeCompare(b.id));
 }
 
-export async function getIntentCatalog(): Promise<IntentCatalog> {
+export async function getIntentCatalog(fetcher: typeof fetch = fetch): Promise<IntentCatalog> {
   const endpoint = `${TELEGRAPH_BASE_URL.replace(/\/$/, "")}/engine/v1/intents`;
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetcher(endpoint, {
       headers: { accept: "application/json" },
       cache: "no-store",
       signal: AbortSignal.timeout(4500)
