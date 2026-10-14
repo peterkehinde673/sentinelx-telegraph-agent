@@ -41,7 +41,7 @@ export function buildGenericExecutionPlan(
   now: Date = new Date()
 ): GenericExecutionPlan {
   const discoveryIsLive = intents.source === "live" && miners.source === "live";
-  const planned = intents.canonical.map((intent): IntentExecutionPlan => {
+  const planned = [...intents.canonical].sort((a, b) => a.id.localeCompare(b.id)).map((intent): IntentExecutionPlan => {
     const declared = miners.miners.filter((miner) =>
       (miner.activationStatus ?? "").toLowerCase() === "active" &&
       miner.supportedIntents.includes(intent.id) &&
