@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildGenericExecutionPlan } from "./planner";
 import type { IntentCatalog } from "./catalog";
 import type { MinerCatalog } from "./miners";
+import { PROPOSED_FUTURE_INTENTS } from "./future-intents";
 
 const intents: IntentCatalog = {
   canonical: [
@@ -9,7 +10,7 @@ const intents: IntentCatalog = {
     { id: "A_NEW_INTENT_ADDED_LATER", description: "Future canonical intent", minerCount: 1, source: "telegraph" },
     { id: "UNSERVED_INTENT", description: "No current provider", minerCount: 0, source: "telegraph" }
   ],
-  proposed: [{ id: "LOCAL_PROPOSAL", label: "Local proposal", category: "Test", purpose: "Not canonical" }],
+  proposed: [PROPOSED_FUTURE_INTENTS[0]],
   fetchedAt: "2026-10-14T00:00:00.000Z",
   source: "live"
 };
