@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getMinerCatalog, parseMinerCatalog } from "./miners";
+import { getIntentMinerAvailability, getMinerCatalog, parseMinerCatalog } from "./miners";
 
 describe("Telegraph miner discovery normalization", () => {
   it("parses documented miner fields and supported intents", () => {
@@ -10,7 +10,7 @@ describe("Telegraph miner discovery normalization", () => {
       activation_status: "active",
       supported_intents: ["CODE_REVIEW", "WEB_SEARCH", "invalid"],
       min_price_usdc: "0.01",
-      endpoints: [{ path: "/review", method: "POST" }]
+      endpoints: [{ path: "/review", method: "POST", schema: null }]
     }])).toEqual([{
       id: "12",
       name: "Sample Miner",
@@ -32,6 +32,17 @@ describe("Telegraph miner discovery normalization", () => {
     ] });
     expect(miners.map((miner) => miner.id)).toEqual(["2", "10"]);
     expect(miners[0].name).toBe("Two updated");
+  });
+
+  it("validates endpoint metadata and derives conservative intent availability", () => {
+    const miners = parseMinerCatalog([
+      { id: 1, name: "Active valid", activation_status: "active", supported_intents: ["CODE_REVIEW"], endpoints: [{ path: "/review", method: "post", schema: { type: "object" } }] },
+      { id: 2, name: "Inactive", activation_status: "inactive", supported_intents: ["CODE_REVIEW"], endpoints: [{ path: "/review", method: "POST" }] },
+      { id: 3, name: "Invalid endpoint", activation_status: "active", supported_intents: ["CODE_REVIEW"], endpoints: [{ path: "review", method: "POST" }, { path: "/x", method: "TRACE" }] }
+    ]);
+    expect(miners[0].endpoints).toEqual([{ path: "/review", method: "POST", schema: { type: "object" } }]);
+    expect(getIntentMinerAvailability(miners, "CODE_REVIEW")).toEqual({ intentId: "CODE_REVIEW", available: true, minerIds: ["1"], reason: null });
+    expect(getIntentMinerAvailability(miners, "SANCTIONS_SCREENING_MATCH").available).toBe(false);
   });
 
   it("returns an empty list for unrecognized payloads", () => {
