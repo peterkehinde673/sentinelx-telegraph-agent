@@ -46,7 +46,7 @@ describe("live canonical intent normalization", () => {
 
   it("keeps future proposals in a separate product registry", () => {
     expect(PROPOSED_FUTURE_INTENTS.length).toBeGreaterThan(10);
-    const canonicalWorkflowIds = new Set(EXCHANGE_INTENTS.map((intent) => intent.id));
+    const canonicalWorkflowIds = new Set<string>(EXCHANGE_INTENTS.map((intent) => intent.id));
     expect(PROPOSED_FUTURE_INTENTS.every((intent) => !canonicalWorkflowIds.has(intent.id))).toBe(true);
     expect(PROPOSED_FUTURE_INTENTS.every((intent) => intent.category && intent.purpose)).toBe(true);
   });
