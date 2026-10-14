@@ -25,8 +25,8 @@ The product must cover:
 
 ## Current control state
 
-- **Last verified:** 2026-10-14 — GitHub Actions run #33 passed on commit `9bb59421d9f91e41abc6ab7472e942541c2ac0c5`; TypeScript check, unit tests, and production build all succeeded. The normalized endpoint test expectation is corrected. Live Telegraph endpoint payloads and actual per-intent schema compatibility remain unverified.
-- **Current next action:** Capture live `/api/miners` and `/engine/v1/intents` responses from a reachable runtime, validate actual endpoint schemas and per-intent coverage, and expose verified availability in the dashboard before wiring the execution planner.
+- **Last verified:** 2026-10-14 — GitHub Actions run #40 passed on commit `f7b0a54cc62ffef8e9a640aea07bd4b7ba4ccc37`; TypeScript check, unit tests, and production build all succeeded. Intent availability logic and its read-only API are covered by tests. Live Telegraph endpoint payloads and actual per-intent schema compatibility remain unverified.
+- **Current next action:** Run `.github/workflows/telegraph-discovery-diagnostic.yml` manually to capture live `/api/miners` and `/engine/v1/intents` responses; validate actual endpoint schemas and per-intent coverage before wiring the execution planner. The diagnostic workflow is read-only and never calls a paid endpoint.
 - **Secrets configured:** Not verified.
 - **Public demo deployment:** Not verified.
 - **Real Telegraph paid transaction:** Not verified.
