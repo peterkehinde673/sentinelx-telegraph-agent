@@ -111,3 +111,8 @@ footer { display: flex; justify-content: space-between; gap: 15px; padding: 22px
   .catalog-tabs { justify-content: stretch; }
   .catalog-tabs button { flex: 1; }
 }
+
+/* Conservative per-intent availability states */
+.availability-available { color: var(--lime); border: 1px solid rgba(201,245,106,.28); background: rgba(201,245,106,.05); }
+.availability-unavailable { color: #ffaaa0; border: 1px solid rgba(255,170,160,.28); background: rgba(255,170,160,.05); }
+.availability-unknown { color: var(--amber); border: 1px solid rgba(241,198,116,.3); background: rgba(241,198,116,.05); }
