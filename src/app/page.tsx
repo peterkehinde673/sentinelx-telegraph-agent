@@ -27,7 +27,7 @@ export default function Home() {
         </p>
         <div className="notice" role="status">
           <strong>Preparation build</strong>
-          <span>Live catalogue discovery is being integrated. Paid routing, settlement and live risk results are not connected yet.</span>
+          <span>The full canonical intent registry is discovered dynamically below. These six mission examples are not an allowlist. Paid routing, settlement and live risk results are not connected yet.</span>
         </div>
       </section>
 
@@ -40,7 +40,7 @@ export default function Home() {
         <article className="metric">
           <span className="metric-label">MISSION WORKFLOW</span>
           <strong>{EXCHANGE_INTENTS.length.toString().padStart(2, "0")}</strong>
-          <span className="metric-note">Initial workflow building blocks</span>
+          <span className="metric-note">Curated mission examples · not the full registry</span>
         </article>
         <article className="metric">
           <span className="metric-label">SETTLED REQUESTS</span>
@@ -52,8 +52,8 @@ export default function Home() {
       <section className="section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">EXCHANGE MISSION</p>
-            <h2>Evidence we intend to assemble</h2>
+            <p className="eyebrow">MISSION-SPECIFIC EXAMPLES</p>
+            <h2>Exchange mission workflow examples</h2>
           </div>
           <span className="pill">PLANNED · NOT LIVE</span>
         </div>
