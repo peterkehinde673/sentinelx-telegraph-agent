@@ -1,5 +1,11 @@
 export const TELEGRAPH_MINERS_URL = `${(process.env.TELEGRAPH_API_URL ?? "https://devnode.telegraphprotocol.com").replace(/\/$/, "")}/api/miners`;
 
+export type TelegraphMinerEndpoint = {
+  path: string;
+  method: string;
+  schema: unknown | null;
+};
+
 export type TelegraphMiner = {
   id: string;
   name: string;
@@ -7,7 +13,7 @@ export type TelegraphMiner = {
   activationStatus: string | null;
   supportedIntents: string[];
   minPriceUsdc: number | null;
-  endpoints: unknown[];
+  endpoints: TelegraphMinerEndpoint[];
 };
 
 export type MinerCatalog = {
@@ -28,6 +34,14 @@ function stringValue(value: unknown): string | null {
 function stringList(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return [...new Set(value.filter((item): item is string => typeof item === "string" && /^[A-Z][A-Z0-9_]{1,95}$/.test(item)))].sort();
+}
+
+function readEndpoint(value: unknown): TelegraphMinerEndpoint | null {
+  if (!isRecord(value)) return null;
+  const path = stringValue(value.path ?? value.endpoint);
+  const method = stringValue(value.method)?.toUpperCase() ?? null;
+  if (!path || !path.startsWith("/") || !method || !/^(GET|POST|PUT|PATCH|DELETE)$/.test(method)) return null;
+  return { path, method, schema: value.schema ?? value.input_schema ?? value.inputSchema ?? null };
 }
 
 function readMiner(value: unknown): TelegraphMiner | null {
@@ -52,7 +66,9 @@ function readMiner(value: unknown): TelegraphMiner | null {
     activationStatus: stringValue(value.activation_status) ?? stringValue(value.activationStatus) ?? stringValue(value.status),
     supportedIntents: stringList(value.supported_intents ?? value.supportedIntents ?? value.intents),
     minPriceUsdc,
-    endpoints: Array.isArray(value.endpoints) ? value.endpoints : []
+    endpoints: Array.isArray(value.endpoints)
+      ? value.endpoints.map(readEndpoint).filter((endpoint): endpoint is TelegraphMinerEndpoint => endpoint !== null)
+      : []
   };
 }
 
@@ -91,4 +107,19 @@ export async function getMinerCatalog(fetcher: typeof fetch = fetch): Promise<Mi
       error: error instanceof Error ? error.message : "Unknown miner discovery error"
     };
   }
+}
+
+/** Returns only miners whose provider-reported state and endpoint metadata match the intent. */
+export function getIntentMinerAvailability(miners: TelegraphMiner[], intentId: string) {
+  const eligible = miners.filter((miner) =>
+    (miner.activationStatus ?? "").toLowerCase() === "active" &&
+    miner.supportedIntents.includes(intentId) &&
+    miner.endpoints.length > 0
+  );
+  return {
+    intentId,
+    available: eligible.length > 0,
+    minerIds: eligible.map((miner) => miner.id),
+    reason: eligible.length > 0 ? null : "No active discovered miner declares this intent with a valid endpoint path and method."
+  };
 }
