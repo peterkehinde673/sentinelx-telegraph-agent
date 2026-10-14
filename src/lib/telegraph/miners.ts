@@ -13,6 +13,9 @@ export type TelegraphMiner = {
   activationStatus: string | null;
   supportedIntents: string[];
   minPriceUsdc: number | null;
+  /** Provider-supplied miner-level schemas; untrusted until validated against a specific endpoint. */
+  inputSchema?: unknown;
+  outputSchema?: unknown;
   endpoints: TelegraphMinerEndpoint[];
 };
 
@@ -66,6 +69,8 @@ function readMiner(value: unknown): TelegraphMiner | null {
     activationStatus: stringValue(value.activation_status) ?? stringValue(value.activationStatus) ?? stringValue(value.status),
     supportedIntents: stringList(value.supported_intents ?? value.supportedIntents ?? value.intents),
     minPriceUsdc,
+    ...(Object.prototype.hasOwnProperty.call(value, "input_schema") ? { inputSchema: value.input_schema } : {}),
+    ...(Object.prototype.hasOwnProperty.call(value, "output_schema") ? { outputSchema: value.output_schema } : {}),
     endpoints: Array.isArray(value.endpoints)
       ? value.endpoints.map(readEndpoint).filter((endpoint): endpoint is TelegraphMinerEndpoint => endpoint !== null)
       : []
