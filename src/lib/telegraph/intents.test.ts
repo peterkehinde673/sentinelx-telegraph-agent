@@ -44,9 +44,10 @@ describe("live canonical intent normalization", () => {
     expect(parsed[0]).toMatchObject({ id: "WEB_SEARCH", description: "Latest description", minerCount: 2 });
   });
 
-  it("keeps future proposals separate from canonical IDs", () => {
+  it("keeps future proposals in a separate product registry", () => {
     expect(PROPOSED_FUTURE_INTENTS.length).toBeGreaterThan(10);
-    expect(PROPOSED_FUTURE_INTENTS.every((intent) => intent.id.endsWith("_VERIFY") || intent.id.includes("TOKEN") || intent.id.includes("PROJECT") || intent.id.includes("BRIDGE"))).toBe(true);
-    expect(parseCanonicalIntents(PROPOSED_FUTURE_INTENTS)).toEqual([]);
+    const canonicalWorkflowIds = new Set(EXCHANGE_INTENTS.map((intent) => intent.id));
+    expect(PROPOSED_FUTURE_INTENTS.every((intent) => !canonicalWorkflowIds.has(intent.id))).toBe(true);
+    expect(PROPOSED_FUTURE_INTENTS.every((intent) => intent.category && intent.purpose)).toBe(true);
   });
 });
