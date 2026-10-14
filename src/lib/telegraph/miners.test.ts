@@ -22,6 +22,28 @@ describe("Telegraph miner discovery normalization", () => {
     }]);
   });
 
+  it("accepts the captured live miner shape with numeric-string IDs and top-level schemas", () => {
+    expect(parseMinerCatalog([{
+      id: "9002",
+      slug: "txlens",
+      name: "TxLens",
+      endpoints: [{ path: "/check-tx", method: "GET", description: "Transaction lookup" }],
+      input_schema: { type: "object", properties: { tx_hash: { type: "string" } } },
+      output_schema: { type: "object" },
+      supported_intents: ["ONCHAIN_TX_LOOKUP", "CODE_REVIEW"],
+      activation_status: "active",
+      min_price_usdc: 10000
+    }])).toEqual([{
+      id: "9002",
+      name: "TxLens",
+      slug: "txlens",
+      activationStatus: "active",
+      supportedIntents: ["CODE_REVIEW", "ONCHAIN_TX_LOOKUP"],
+      minPriceUsdc: 10000,
+      endpoints: [{ path: "/check-tx", method: "GET", schema: null }]
+    }]);
+  });
+
   it("supports wrapped payloads, deduplicates by ID, and sorts numerically", () => {
     const miners = parseMinerCatalog({ data: [
       { id: 10, name: "Ten" },
