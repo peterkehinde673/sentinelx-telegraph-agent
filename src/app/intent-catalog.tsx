@@ -10,6 +10,12 @@ type CatalogIntent = {
   label?: string;
   category?: string;
   purpose?: string;
+  availability?: {
+    status: "available" | "unavailable" | "unknown";
+    activeMinerIds: string[];
+    reportedMinerCount: number | null;
+    reason: string | null;
+  };
 };
 
 type CatalogPayload = {
@@ -17,6 +23,7 @@ type CatalogPayload = {
   proposed: CatalogIntent[];
   fetchedAt: string | null;
   source: "live" | "fallback";
+  minerSource?: "live" | "fallback";
   error?: string;
 };
 
@@ -28,7 +35,7 @@ export default function IntentCatalog() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/intents", { cache: "no-store" })
+    fetch("/api/availability", { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) throw new Error("Could not load the intent catalogue");
         return response.json() as Promise<CatalogPayload>;
@@ -40,6 +47,7 @@ export default function IntentCatalog() {
           proposed: [],
           fetchedAt: null,
           source: "fallback",
+          minerSource: "fallback",
           error: error instanceof Error ? error.message : "Catalogue unavailable"
         });
       })
@@ -54,7 +62,8 @@ export default function IntentCatalog() {
       label: intent.id.replaceAll("_", " ").toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase()),
       description: intent.description,
       status: "canonical" as const,
-      minerCount: intent.minerCount ?? null
+      minerCount: intent.minerCount ?? null,
+      availability: intent.availability ?? { status: "unknown" as const, activeMinerIds: [], reportedMinerCount: intent.minerCount ?? null, reason: "Availability has not been checked." }
     }));
     const proposed = catalog.proposed.map((intent) => ({
       id: intent.id,
@@ -97,6 +106,7 @@ export default function IntentCatalog() {
         <strong>{entries.length.toLocaleString()}</strong> matching capabilities
         <span>{catalog?.source === "live" ? `${catalog.canonical.length} canonical from Telegraph` : "Canonical list temporarily unavailable"}</span>
         <span>{catalog?.proposed.length ?? 0} roadmap proposals</span>
+        <span>{catalog?.minerSource === "live" ? "Miner coverage checked" : "Miner coverage unknown"}</span>
       </div>
 
       {catalog?.source !== "live" && !loading && (
@@ -116,18 +126,23 @@ export default function IntentCatalog() {
               <span className={item.status === "canonical" ? "tag tag-canonical" : "tag tag-proposed"}>
                 {item.status === "canonical" ? "CANONICAL" : "PROPOSED"}
               </span>
-              {item.status === "canonical" && item.minerCount !== null && (
-                <span className="miner-count">{item.minerCount} miners</span>
+              {item.status === "canonical" && (
+                <span className={`tag availability-${item.availability.status}`}>
+                  {item.availability.status === "available" ? "MINER AVAILABLE" : item.availability.status === "unavailable" ? "NO ACTIVE MINER" : "AVAILABILITY UNKNOWN"}
+                </span>
               )}
-              {item.status === "canonical" && item.minerCount === 0 && (
-                <span className="miner-count">No live miner reported</span>
+              {item.status === "canonical" && item.availability.status === "available" && (
+                <span className="miner-count">{item.availability.activeMinerIds.length} eligible miner(s)</span>
+              )}
+              {item.status === "canonical" && item.availability.status === "unknown" && (
+                <span className="miner-count">Live check required</span>
               )}
             </div>
           </article>
         ))}
         {!loading && entries.length === 0 && <p className="empty-state">No matches. Try another search or change the catalogue filter.</p>}
       </div>
-      <p className="catalog-footnote">Canonical status and miner coverage are sourced from the live Telegraph endpoint when available. A canonical intent may have zero active miners; requests must check coverage before spending. Proposals are not submitted as paid intent IDs.</p>
+      <p className="catalog-footnote">Canonical registration and miner availability are separate. Availability is marked unknown unless both live discovery sources respond successfully. A displayed eligible miner is metadata-based, not a health check or payment authorization. Proposals are not submitted as paid intent IDs.</p>
     </section>
   );
 }
